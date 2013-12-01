@@ -3,7 +3,7 @@
  * Plugin Name: SubitoSMS
  * Plugin URI: http://www.subitosms.it/wordpress
  * Description: Send SMS messages to all your subscribed users and add mobile numbero to registration form
- * Version: 1.1
+ * Version: 1.2
  * Author: SubitoSMS (by Linkas SRL)
  * Author URI: http://www.subitosms.it/wordpress
  * License: GPLv3
