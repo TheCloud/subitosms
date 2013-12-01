@@ -1,0 +1,251 @@
+# Copyright (C) 2013 SubitoSMS
+# This file is distributed under the same license as the SubitoSMS package.
+msgid ""
+msgstr ""
+"Project-Id-Version: SubitoSMS 1.1\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/subitosms\n"
+"POT-Creation-Date: 2013-11-26 08:47:16+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2013-11-30 14:52+0100\n"
+"Last-Translator: Julien Buratto <julien.buratto@linkas.it>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: Poedit 1.5.7\n"
+
+#: subitosms.php:34
+msgid "SubitoSMS Account"
+msgstr "Account SubitoSMS"
+
+#: subitosms.php:35
+msgid "Username"
+msgstr "Username"
+
+#: subitosms.php:36
+msgid "Password"
+msgstr "Password"
+
+#: subitosms.php:37
+msgid "SMS Sender"
+msgstr "Mittente SMS"
+
+#: subitosms.php:44
+msgid "Schedule for:"
+msgstr "Programma per:"
+
+#. translators: 1: month, 2: day, 3: year, 4: hour, 5: minute
+#: subitosms.php:46 subitosms.php:326
+msgid "%1$s %2$s, %3$s @ %4$s : %5$s"
+msgstr "%2$s %1$s, %3$s @ %4$s : %5$s"
+
+#. #-#-#-#-#  subitosms.pot (SubitoSMS 1.0)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: subitosms.php:52
+msgid "SubitoSMS"
+msgstr "SubitoSMS"
+
+#: subitosms.php:53
+msgid "Send SMS"
+msgstr "Invia SMS"
+
+#: subitosms.php:54
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: subitosms.php:59
+msgid "You do not have sufficient permissions to sendsms."
+msgstr "Non hai i permessi necessari per inviare SMS"
+
+#: subitosms.php:61
+msgid "M j, Y @ G:i"
+msgstr "j/M/Y @ G:i"
+
+#: subitosms.php:73
+msgid "You can not send an empty message."
+msgstr "Non puoi inviare SMS vuoti"
+
+#: subitosms.php:79
+msgid "The message can not be longer than 160 characters."
+msgstr "Il messaggio non può superare i 160 caratteri"
+
+#: subitosms.php:107
+msgid "Whoops, the provided date is invalid."
+msgstr "Ops, la data proposta non è valida."
+
+#: subitosms.php:124
+msgid "Invalid nonce. Please retry"
+msgstr "Autenticazione errata, riprova."
+
+#: subitosms.php:128
+msgid ""
+"Before you can use this plugin you must configure it in the settings page."
+msgstr "Prima di utilizzare il plugin, configuralo nelle impostazioni."
+
+#: subitosms.php:141
+msgid ""
+"There are no users registered with mobile phone to which send the message."
+msgstr ""
+"Non ci sono utenti registrati che hanno memorizzato il numero di cellulare."
+
+#: subitosms.php:154
+msgid "Your message has been taken over by Subito SMS."
+msgstr "Il tuo SMS è stato preso in carico da SubitoSMS."
+
+#: subitosms.php:155
+msgid ""
+"You can see the status of submission at the <a href=\"%s\" target=\"blank"
+"\">following link</a>."
+msgstr ""
+"Verifica lo stato di invia direttamente sul sito cliccando  <a href=\"%s\" "
+"target=\"blank\">questo collegamento</a>."
+
+#: subitosms.php:166
+msgid "Scheduled for: <b>%1$s</b>"
+msgstr "Programmato per: <b>%1$s</b>"
+
+#: subitosms.php:170
+msgid "Send <b>immediately</b>"
+msgstr "Invia <b>immediatamente</b>"
+
+#: subitosms.php:181 subitosms.php:194
+msgid "SubitoSMS Send"
+msgstr "SubitoSMS"
+
+#: subitosms.php:182
+msgid ""
+"Before you can use this plugin you must configure it in the <a href=\"%s"
+"\">settings page</a>."
+msgstr ""
+"Prima di poter utilizzare questo plugin, devi configurarlo nella <a href=\"%s"
+"\">pagina delle impostazioni</a>."
+
+#: subitosms.php:196
+msgid "Send an sms to all registered users."
+msgstr "Invia un SMS a tutti gli utenti registrati."
+
+#: subitosms.php:197
+msgid ""
+"You have a credit of %d messages. <a href=\"%s\" target=\"blank\">Buy other "
+"credit!</a>"
+msgstr ""
+"Hai un credito residuo di %d messaggi e %d utenti registrati. <a href=\"%s\" "
+"target=\"blank\">Acquista altro credito!</a>"
+
+#: subitosms.php:205
+msgid "Date"
+msgstr "Data"
+
+#: subitosms.php:211
+msgid "Edit"
+msgstr "Modifica"
+
+#: subitosms.php:218
+msgid "Message"
+msgstr "Messaggio"
+
+#: subitosms.php:218
+msgid "(required)"
+msgstr "(richiesto)"
+
+#: subitosms.php:223
+msgid "Send"
+msgstr "Invia"
+
+#: subitosms.php:235
+msgid "You do not have sufficient permissions to manage options for this site."
+msgstr "Non hai i permessi per gestire le opzioni di questo sito."
+
+#: subitosms.php:240
+msgid "SubitoSMS Settings"
+msgstr "Impostazioni SubitoSMS"
+
+#: subitosms.php:250
+msgid "Configure the plugin with the credentials of your account."
+msgstr ""
+"Configura il plugin utilizzando le credenziali del tuo account SubitoSMS."
+
+#: subitosms.php:251
+msgid ""
+"If you do not have an account yet, sign up by following <a href=\"%s\" "
+"target=\"_blank\">this link</a>"
+msgstr ""
+"Se non hai ancora un account, registrati <strong>gratuitamente</strong> "
+"cliccando su <a href=\"%s\" target=\"_blank\">questo collegamento</a>."
+
+#: subitosms.php:276
+msgid "Please enter a valid Username"
+msgstr "Digita una Username valida"
+
+#: subitosms.php:279
+msgid "Please enter a valid Password"
+msgstr "Digita una Password valida"
+
+#. translators: 1: month number (01, 02, etc.), 2: month abbreviation
+#: subitosms.php:315
+msgid "%1$s-%2$s"
+msgstr "%1$s-%2$s"
+
+#: subitosms.php:341
+msgid "OK"
+msgstr "OK"
+
+#: subitosms.php:342
+msgid "Cancel"
+msgstr "Annulla"
+
+#: subitosms.php:376
+msgid "SubitoSMS Extra profile information"
+msgstr "Informazioni extra sul profilo SubitoSMS"
+
+#: subitosms.php:379 subitosms.php:418
+msgid "Mobile number"
+msgstr "Numero di cellulare"
+
+#: subitosms.php:382
+msgid "Please enter your mobile number. Eg. +39 338..."
+msgstr "Digita il tuo numero di telefono. Es, +39335...."
+
+#: subitosms.php:393
+msgid "<strong>ERROR</strong>: You do not have permission to edit this user"
+msgstr ""
+"<strong>ERROR</strong>: Non hai i permessi per modificare questo utente"
+
+#: subitosms.php:398
+msgid ""
+"<strong>ERROR</strong>: Please enter a valid mobile number. Eg. +39 338..."
+msgstr ""
+"<strong>ERRORE</strong>: Digita un numero di telefono in formato "
+"internazionale col +39 davanti, senza spazi o caratteri di separazione"
+
+#: subitosms.php:429
+msgid "<strong>ERROR</strong>: Please enter a valid mobile number"
+msgstr "<strong>ERRORE</strong>: Digita un numero di telefono valido"
+
+#. Plugin URI of the plugin/theme
+msgid "http://www.subitosms.it/WordPress"
+msgstr "http://www.subitosms.it/wordpress"
+
+#. Description of the plugin/theme
+msgid "A brief description of the Plugin. TODO"
+msgstr ""
+"Questo plugin permette di inviare SMS agli utenti che hanno inserito il "
+"numero di cellulare in fase di registrazione.Gli utenti già registrati "
+"potranno inserire il loro numero di telefono nel loro profilo."
+
+#. Author of the plugin/theme
+msgid "Garda Informatica"
+msgstr "SubitoSMS (by Linkas SRL)"
+
+#. Author URI of the plugin/theme
+msgid "http://www.gardainformatica.it"
+msgstr "http://www.SubitoSMS.it"
+
+msgid "You have a credit of %d messages and %d users with mobile."
+msgstr "Hai un credito di %d SMS e %d utenti che possono riceverli."
+
+msgid ""
+"You haven't enough credit to send messages, <a href=\"%s\">buy more credit</"
+"a>."
+msgstr ""
+"Non hai abbastanza credito per inviare i messaggi, <a href=\"%s\">acquista "
+"del credito</a>."
