@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2013-11-30 14:52+0100\n"
+"PO-Revision-Date: 2013-12-02 10:51+0100\n"
 "Last-Translator: Julien Buratto <julien.buratto@linkas.it>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: Poedit 1.5.7\n"
@@ -88,7 +88,7 @@ msgstr ""
 "Non ci sono utenti registrati che hanno memorizzato il numero di cellulare."
 
 #: subitosms.php:154
-msgid "Your message has been taken over by Subito SMS."
+msgid "Your message has been taken over by SubitoSMS."
 msgstr "Il tuo SMS è stato preso in carico da SubitoSMS."
 
 #: subitosms.php:155
@@ -249,3 +249,15 @@ msgid ""
 msgstr ""
 "Non hai abbastanza credito per inviare i messaggi, <a href=\"%s\">acquista "
 "del credito</a>."
+
+msgid "Do you want to send ?"
+msgstr "Sicuro di voler inviare ?"
+
+msgid ""
+"User registration is <strong>turned-off</strong>, so not many users will be "
+"able to save their phone number.Turn-on user registration by clicking on <a "
+"href=\"options-general.php\">Settings -&gt; General</a>"
+msgstr ""
+"La registrazione utenti è <strong>disabilitata</strong>, quindi non molti "
+"potranno memorizzare il numero di telefono.Abiita la registrazione utenti "
+"cliccando su <a href=\"options-general.php\">Impostazioni -&gt; Generale</a> "

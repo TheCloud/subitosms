@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SubitoSMS
  * Plugin URI: http://www.subitosms.it/wordpress
- * Description: Send SMS messages to all your subscribed users and add mobile number to registration form
+ * Description: Send SMS messages to all your subscribed users and add mobile number to registration form.
  * Version: 1.2
  * Author: SubitoSMS (by Linkas SRL)
  * Author URI: http://www.subitosms.it/wordpress
@@ -163,7 +163,7 @@ function subitosms_admin_send_sms() {
 		}else{
 		
 			$check_sped='https://www.subitosms.it/check_sped.php?'.build_query(array('tok'=>md5($options['username'].":".$options['password']),'sped'=>$send_result_id));
-			add_settings_error('', 'take_over', esc_html__( 'Your message has been taken over by Subito SMS.' ,'subitosms'), 'updated' ); 
+			add_settings_error('', 'take_over', esc_html__( 'Your message has been taken over by SubitoSMS.' ,'subitosms'), 'updated' ); 
 			add_settings_error('', 'submission_status', sprintf(__('You can see the status of submission at the <a href="%s" target="blank">following link</a>.','subitosms'),esc_attr($check_sped)), 'updated' ); 
 		}
     } else {
@@ -179,7 +179,7 @@ function subitosms_admin_send_sms() {
 		$date = date_i18n( $datef, strtotime( $send_date ) );
 	}else{
 		$send_date=current_time('mysql');
-		$stamp = __('Send <b>immediately</b>');
+		$stamp = __('Send <b>immediately</b>','subitosms');
 		$date = date_i18n( $datef, strtotime( $send_date ) );
 	}
 	
@@ -211,6 +211,11 @@ function subitosms_admin_send_sms() {
 			<?php if($users_count>$credit): ?>
 				<?php echo sprintf(__('You haven\'t enough credit to send messages, <a href="%s">buy more credit</a>.','subitosms'),esc_attr($buy_credit_url)); ?>
 			<?php endif;?></p>
+			<?php if(!get_option('users_can_register')):?>
+            <p><?php echo __('User registration is <strong>turned-off</strong>, so not many users will be able to save their phone number.Turn-on user registration by clicking on <a href="options-general.php">Settings -&gt; General</a>','subitosms');?
+            <?php else: ?>
+            <?php endif;?>
+			
 			<?php if ($credit>0){ ?>
 				<form method="post" action="" name="sendsms_form" id="sendsms_form" class="validate">
 				<?php wp_nonce_field('send-sms','subitosms_nonce'); ?>
@@ -236,9 +241,7 @@ function subitosms_admin_send_sms() {
 						<td><textarea name="sms_message" rows="5" cols="30" id="sms_message" maxlength="160" /><?php esc_textarea($sms_message); ?></textarea></td>
 					</tr>
 				</table>
-	
-				<?php submit_button( __( 'Send','subitosms'), 'primary', 'submit_sendsms' ); ?>
-	
+				<?php submit_button( __( 'Send','subitosms'), 'primary', 'submit_sendsms',null,array('onclick'=>'return confirm(\''.__('Do you want to send ?','subitosms').'\')') ); ?>
 	
 				</form>
 			<?php } ?>
