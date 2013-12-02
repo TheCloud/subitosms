@@ -212,7 +212,7 @@ function subitosms_admin_send_sms() {
 				<?php echo sprintf(__('You haven\'t enough credit to send messages, <a href="%s">buy more credit</a>.','subitosms'),esc_attr($buy_credit_url)); ?>
 			<?php endif;?></p>
 			<?php if(!get_option('users_can_register')):?>
-            <p><?php echo __('User registration is <strong>turned-off</strong>, so not many users will be able to save their phone number.Turn-on user registration by clicking on <a href="options-general.php">Settings -&gt; General</a>','subitosms');?
+            <p><?php echo __('User registration is <strong>turned-off</strong>, so not many users will be able to save their phone number.Turn-on user registration by clicking on <a href="options-general.php">Settings -&gt; General</a>','subitosms');?>
             <?php else: ?>
             <?php endif;?>
 			
