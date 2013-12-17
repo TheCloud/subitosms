@@ -4,7 +4,7 @@ Donate link:
 Tags: sms, gateway, subitosms
 Requires at least: 3.5.1
 Tested up to: 3.8
-Stable tag: trunk
+Stable tag: 1.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -41,6 +41,9 @@ Yes, registration is free and you can test with some free SMS messages.
 3. **Settings** - Settings are very simple, username/password and the sender you want the user to see as from.
 
 == ChangeLog ==
+
+= 1.3 =
+* Support for WordPress 3.8
 
 = 1.2 =
 * First public release
