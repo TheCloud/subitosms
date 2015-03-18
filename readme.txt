@@ -15,6 +15,10 @@ Send SMS texts to all your WordPress web-site's registered users in one click!
 SubitoSMS WordPress Plugin lets you send SMS texts to your WP web-site's registered users, connecting to your SubitoSMS.it account.
 It also modifies the basic WP user's registration form, adding a field for the user's mobile number.
 
+= New features =
+1. Allow to send SMS to all users when new post is created
+2. Allow to select users to send SMS
+
 == Installation ==
 
 Installation is simple as a standard Wordpress Plugin.
