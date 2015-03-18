@@ -3,7 +3,7 @@
  * Plugin Name: SubitoSMS
  * Plugin URI: http://www.subitosms.it/wordpress
  * Description: Send SMS messages to all your subscribed users and add mobile number to registration form.
- * Version: 1.2
+ * Version: 1.4
  * Author: SubitoSMS (by Linkas SRL)
  * Author URI: http://www.subitosms.it/wordpress
  * License: GPLv3
@@ -39,6 +39,7 @@ function subitosms_admin_notices_options() {
 }
 function subitosms_plugins_loaded(){
 	load_plugin_textdomain('subitosms', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	define("SUBITOSMS_DEFAULT_TEXTAUTOSEND",sprintf(__("Hello %s, on %s was published a new article entitled \"%s\"",'subitosms'),"[name]","[sitename]","[post_title]"));
 }
 
 function subitosms_admin_init(){
@@ -47,6 +48,11 @@ function subitosms_admin_init(){
 	add_settings_field('subitosms_options_username', __('Username','subitosms'), 'subitosms_options_username_callback', 'subitosms-admin-settings', 'subitosms_options_main');
 	add_settings_field('subitosms_options_password', __('Password','subitosms'), 'subitosms_options_password_callback', 'subitosms-admin-settings', 'subitosms_options_main');
 	add_settings_field('subitosms_options_sms_sender', __('SMS Sender','subitosms'), 'subitosms_options_smssender_callback', 'subitosms-admin-settings', 'subitosms_options_main');
+
+	add_settings_field('subitosms_options_autosend', __('Automatic Sending','subitosms'), 'subitosms_options_autosend_callback', 'subitosms-admin-settings', 'subitosms_options_main');
+	add_settings_field('subitosms_options_textautosend', __('Automatic Sending Text','subitosms'), 'subitosms_options_textautosend_callback', 'subitosms-admin-settings', 'subitosms_options_main');
+
+
 	
 	wp_register_style( 'subitosms_css', plugins_url('css/subitosms.css', __FILE__) );
 	wp_enqueue_style( 'subitosms_css' );
@@ -76,6 +82,33 @@ function subitosms_admin_send_sms() {
 	$edit = 0;
 	
 	$send_result_id=0;
+	
+	
+	
+	$bulk_request=false;
+	$bulk_users_data_ok=array();
+	$bulk_users_data_ko=array();
+	if (isset($_REQUEST['bk']) && $_REQUEST['bk']==1){
+		$bulk_request=true;
+		$bulk_user_ids=array();
+		if(isset($_REQUEST['ui'])) {
+			$bulk_user_ids = array_map('intval', $_REQUEST['ui']);
+		}
+		
+		if (!empty( $bulk_user_ids )){
+			foreach ($bulk_user_ids as $user_id){
+				$user=get_user_by( 'id', $user_id );
+				if ($user!==false){
+					$mob=get_user_meta($user->ID, 'subitosms_mobnumber', true);
+					if (preg_match(SUBITOSMS_REGEX_VALIDATE_MOB_NUMBER,$mob)){
+						$bulk_users_data_ok[]=array('id'=>$user->ID,'name'=>$user->display_name,'mobnumber'=>$mob);
+					}else{
+						$bulk_users_data_ko[]=array('id'=>$user->ID,'name'=>$user->display_name);
+					}
+				}
+			}
+		}
+	}
 	
     if (isset($_POST['action']) && 'action_sendsms'==$_POST['action']) { 
 		$errors=false;
@@ -140,18 +173,31 @@ function subitosms_admin_send_sms() {
 			add_settings_error('', 'no_settings',esc_html__('Before you can use this plugin you must configure it in the settings page.','subitosms'));
 			$errors=true;
 		}
+		
 		$mobnumbers=array();
 		if (!$errors){
-			$users = get_users('meta_key=subitosms_mobnumber&orderby=nicename');
-			foreach ($users as $user) {
-				$mob=get_user_meta($user->ID, 'subitosms_mobnumber', true);
-				if (preg_match(SUBITOSMS_REGEX_VALIDATE_MOB_NUMBER,$mob)){
-					$mobnumbers[]=$mob;
+			
+			if ($bulk_request){
+				if (empty($bulk_users_data_ok)){
+					add_settings_error('', 'no_settings',esc_html__('The selected users do not have a mobile phone number.','subitosms'));
+					$errors=true;
+				}else{
+					foreach($bulk_users_data_ok as $user){
+						$mobnumbers[]=$user['mobnumber'];
+					}
 				}
-			}
-			if (empty($mobnumbers)){
-				add_settings_error('', 'no_users', esc_html__( 'There are no users registered with mobile phone to which send the message.' ,'subitosms'), 'error' ); 
-				$errors=true;
+			}else{
+				$users = get_users('meta_key=subitosms_mobnumber&orderby=nicename');
+				foreach ($users as $user) {
+					$mob=get_user_meta($user->ID, 'subitosms_mobnumber', true);
+					if (preg_match(SUBITOSMS_REGEX_VALIDATE_MOB_NUMBER,$mob)){
+						$mobnumbers[]=$mob;
+					}
+				}
+				if (empty($mobnumbers)){
+					add_settings_error('', 'no_users', esc_html__( 'There are no users registered with mobile phone to which send the message.' ,'subitosms'), 'error' ); 
+					$errors=true;
+				}
 			}
 		}
 		if (!$errors){
@@ -161,7 +207,7 @@ function subitosms_admin_send_sms() {
 		if ($errors){
 			$edit = 1;
 		}else{
-		
+			$bulk_request=false;
 			$check_sped='https://www.subitosms.it/check_sped.php?'.build_query(array('tok'=>md5($options['username'].":".$options['password']),'sped'=>$send_result_id));
 			add_settings_error('', 'take_over', esc_html__( 'Your message has been taken over by SubitoSMS.' ,'subitosms'), 'updated' ); 
 			add_settings_error('', 'submission_status', sprintf(__('You can see the status of submission at the <a href="%s" target="blank">following link</a>.','subitosms'),esc_attr($check_sped)), 'updated' ); 
@@ -197,8 +243,14 @@ function subitosms_admin_send_sms() {
 	}else{
 		$credit=0;
 		subitosms_ws_get_credit($options,$credit);
-		$users = get_users('meta_key=subitosms_mobnumber&orderby=nicename');
-		$users_count=count($users);
+		
+		if ($bulk_request){
+			$users_count=count($bulk_users_data_ok);
+		}else{
+			$users = get_users('meta_key=subitosms_mobnumber&orderby=nicename');
+			$users_count=count($users);
+		}
+		
 		$buy_credit_url='https://www.subitosms.it/listino_prezzi.php?'.build_query(array('tok'=>md5($options['username'].":".$options['password'])));
 		
     ?>
@@ -206,23 +258,71 @@ function subitosms_admin_send_sms() {
 			<?php screen_icon('subitosms-send'); ?>
 			<h2><?php echo esc_html__('SubitoSMS Send','subitosms'); ?></h2>
 			<?php settings_errors();?>
-			<p><?php echo esc_html__('Send an sms to all registered users.','subitosms'); ?></p>
+			<p><?php 
+				if ($bulk_request){			
+					echo esc_html__('Send an sms to the selected users.','subitosms'); 
+				}else{
+					echo esc_html__('Send an sms to all registered users.','subitosms'); 
+				}
+			?>
+			</p>
 			<p><?php echo sprintf(__('You have a credit of %d messages and %d users with mobile.','subitosms'),$credit,$users_count); ?><br />
 			<?php if($users_count>$credit): ?>
 				<?php echo sprintf(__('You haven\'t enough credit to send messages, <a href="%s">buy more credit</a>.','subitosms'),esc_attr($buy_credit_url)); ?>
 			<?php endif;?></p>
 			<?php if(!get_option('users_can_register')):?>
-            <p><?php echo __('User registration is <strong>turned-off</strong>, so not many users will be able to save their phone number.Turn-on user registration by clicking on <a href="options-general.php">Settings -&gt; General</a>','subitosms');?>
+            <p><?php echo __('User registration is <strong>turned-off</strong>, so not many users will be able to save their phone number.Turn-on user registration by clicking on <a href="options-general.php">Settings -&gt; General</a>','subitosms');?></p>
             <?php else: ?>
             <?php endif;?>
+			
+			<?php 
+			if (!$bulk_request){
+				echo '<p>'.__('If you want to <strong>send a message only to a subset of users</strong> you have to go to the <a href="users.php">page of the user</a>, select the recipients of the message and choose the bulk action <strong>Send SMS</strong>.','subitosms').'</p>';
+			}
+			?>
 			
 			<?php if ($credit>0){ ?>
 				<form method="post" action="" name="sendsms_form" id="sendsms_form" class="validate">
 				<?php wp_nonce_field('send-sms','subitosms_nonce'); ?>
 				<input name="action" type="hidden" value="action_sendsms" />
-	
+				<?php
+				if ($bulk_request){
+					echo '<input name="bk" type="hidden" value="1" />';
+				}else{
+					echo '<input name="bk" type="hidden" value="0" />';
+				}
+				?>
 	
 				<table class="form-table">
+				<?php
+				if ($bulk_request){
+					?>
+					<tr class="form-field">
+						<th scope="row"><label for="bulk_users"><?php _e('Users selected','subitosms'); ?></label></th>
+						<td>
+						<?php
+						$usernames_html=array();
+						foreach ($bulk_users_data_ok as $user){
+							echo '<input name="subitosms_bulk_user_ids[]" type="hidden" value="'.$user['id'].'" />';
+							$usernames_html[]=esc_html($user['name']);
+						}
+						foreach ($bulk_users_data_ko as $user){
+							$usernames_html[]='<span style="color:red;">'.esc_html($user['name']).'</span>';
+						}
+						echo implode(', ',$usernames_html);
+						?>
+						</td>
+					</tr>
+					
+					
+					<?php
+					
+				}
+							
+				
+				
+				?>
+				
 				<tr class="form-field">
 				<th scope="row"><label for="sms_datesend"><?php _e('Date','subitosms'); ?></label></th>
 				
@@ -287,12 +387,30 @@ function subitosms_options_smssender_callback() {
 	echo '<input id="subitosms_options_smssender" name="subitosms_options_array[smssender]" size="40" type="text" value="'.esc_attr($options['smssender']).'" />';
 }
 
+function subitosms_options_autosend_callback() {
+	$options = get_option('subitosms_options_array');
+	echo '<input id="subitosms_options_autosend" name="subitosms_options_array[autosend]" value="1" type="checkbox" '.($options['autosend']?'checked="checked"':'').'  />'.esc_html__( 'Send following text automatically every time you publish a new article.' ,'subitosms');
+}
+
+function subitosms_options_textautosend_callback() {
+	$options = get_option('subitosms_options_array');
+	if (empty($options['textautosend'])){
+		$options['textautosend']=SUBITOSMS_DEFAULT_TEXTAUTOSEND;
+	}
+	echo '<textarea id="subitosms_options_textautosend" name="subitosms_options_array[textautosend]" class="large-text code" rows="3" maxlength="160">'.esc_html($options['textautosend']).'</textarea>'.esc_html(sprintf(__('Enter the text of the message that will be sent to users when you publish a new post. You can use the placeholder %s, %s, %s that will be replaced by their values ​​when sending the message.','subitosms'),"[name]","[sitename]","[post_title]"));
+}
+
+
 function subitosms_options_validate($input) {
 	//add_settings_error('', 'username_error', __('Expecting a Numeric value! Please fix.','subitosms'), 'error' );  
 	$newinput=array();
 	$newinput['username'] = trim($input['username']);
 	$newinput['password'] = trim($input['password']);
 	$newinput['smssender'] = trim($input['smssender']);
+	$newinput['textautosend'] = trim($input['textautosend']);
+	$newinput['autosend'] = isset($input['autosend']) && $input['autosend'];
+	
+	
 	if (empty($newinput['username'])){
 		add_settings_error('', 'username_error', esc_html__('Please enter a valid Username','subitosms'), 'error' );  
 	}
@@ -302,6 +420,13 @@ function subitosms_options_validate($input) {
 	if (empty($newinput['smssender'])){
 		$newinput['smssender']=SUBITOSMS_DEFAULT_SENDER;
 	}
+	if (strlen( utf8_decode( $newinput['textautosend'] ) )>160){
+		add_settings_error('', 'textautosend', esc_html__( 'The message can not be longer than 160 characters.'  ,'subitosms'), 'error' ); 
+	}
+	if (empty($newinput['textautosend'])){
+		$newinput['textautosend']=SUBITOSMS_DEFAULT_TEXTAUTOSEND;
+	}
+	
 	return $newinput;
 }
 
@@ -447,7 +572,7 @@ function subitosms_extra_register_post ( $login, $email, $errors )
 {
 	global $subitosms_mobnumber;
 	if (!preg_match(SUBITOSMS_REGEX_VALIDATE_MOB_NUMBER,$_POST['subitosms_mobnumber'])){
-		$errors->add( 'not_valid_subitosms_mobnumber', __( '<strong>ERROR</strong>: Please enter a valid mobile number' ,'subitosms') );
+		$errors->add( 'not_valid_subitosms_mobnumber', __( '<strong>ERROR</strong>: Please enter a valid mobile number. Eg. +39 338...' ,'subitosms') );
 		return;
 	}
 	
@@ -460,12 +585,156 @@ function subitosms_extra_user_register ( $user_id, $password = "", $meta = array
 }
 
 /*
+ * Bulk action
+*/
+add_action( 'admin_footer-users.php', 'subitosms_custom_bulk_admin_footer' );
+
+function subitosms_custom_bulk_admin_footer(){
+	?>
+    <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            $('<option>').val('bulk_send_subitosms').text(<?php echo json_encode(__('Send SMS','subitosms'));?>)
+                .appendTo("select[name='action'], select[name='action2']");
+        });
+    </script>
+    <?php	
+	
+}
+
+// Versione A
+add_action( 'admin_init', 'subitosms_custom_bulk_send_subitosms');
+// Versione B
+//add_action( 'admin_action_bulk_send_subitosms', 'subitosms_custom_bulk_send_subitosms' );
+//add_action( 'admin_action2_bulk_send_subitosms', 'subitosms_custom_bulk_send_subitosms' );//non funziona
+
+function subitosms_custom_bulk_send_subitosms(){
+	$action=isset($_REQUEST['action'])?$_REQUEST['action']:'';
+	$action2=isset($_REQUEST['action2'])?$_REQUEST['action2']:'';
+	
+	if ($action=='bulk_send_subitosms' || $action2=='bulk_send_subitosms' ){
+		//double check action
+		// get the action
+		$wp_list_table = _get_list_table('WP_Users_List_Table');
+		$action = $wp_list_table->current_action();
+		$allowed_actions = array("bulk_send_subitosms");
+		if(!in_array($action, $allowed_actions)) return;
+		
+		
+		// security check
+		check_admin_referer('bulk-users');
+		$users_ids=array();
+		if(isset($_REQUEST['users'])) {
+			$users_ids = array_map('intval', $_REQUEST['users']);
+		}
+		
+		if(empty($users_ids)) return;
+		
+		$sendback = admin_url( "admin.php?page=subitosms-admin-menu" );
+
+		$sendback=add_query_arg('bk',1 , $sendback );
+		
+		foreach($users_ids as $id){
+			$sendback=add_query_arg('ui[]',$id , $sendback );
+		}
+		
+		wp_redirect($sendback);
+		exit();
+	}
+
+}
+
+
+
+/*
+ * Hook post published
+*/
+
+add_action( 'transition_post_status', 'subitosms_post_status_transition', 10, 3 );
+function subitosms_post_status_transition( $new_status, $old_status, $post ) { 
+	$published=false;
+	if ($new_status=='publish' && $old_status!=$new_status){
+		//published
+
+		$post_id=$post->ID;
+		//double check
+		$subitosms_sent = get_post_meta($post_id, 'subitosms_sent', true);
+		if( empty( $subitosms_sent ) && ! wp_is_post_revision( $post_id ) ) {
+			update_post_meta($post_id, 'subitosms_sent', '1');
+			$published=true;	
+		}
+	}
+	if (!$published){
+		return;
+	}
+
+    $post_title = $post->post_title;
+	$sitename = get_bloginfo( 'name' );
+
+
+	$options = get_option('subitosms_options_array');
+	if (empty($options['autosend'])){
+		$options['autosend']=false;
+	}
+	
+	if (!$options['autosend']){
+		return;
+	}
+	
+	if (empty($options['username']) || empty($options['password'])){
+		return;
+	}
+	
+	$credit=0;
+	subitosms_ws_get_credit($options,$credit,false);
+	if ($credit==0){
+		return;
+	}
+	
+	if (empty($options['textautosend'])){
+		$options['textautosend']=SUBITOSMS_DEFAULT_TEXTAUTOSEND;
+	}
+
+	$sms_message=str_replace(array("[sitename]","[post_title]"),array($sitename,$post_title),$options['textautosend']);
+	
+	$custom_name=strpos($sms_message,'[name]') !== false;
+	
+    
+	$mobnumbers=array();
+	$users = get_users('meta_key=subitosms_mobnumber&orderby=nicename');
+	foreach ($users as $user) {
+		$mob=get_user_meta($user->ID, 'subitosms_mobnumber', true);
+		if (preg_match(SUBITOSMS_REGEX_VALIDATE_MOB_NUMBER,$mob)){
+			if ($custom_name){
+				$mobnumbers[]=array('name'=>$user->display_name,'mobnumber'=>$mob);
+			}else{
+				$mobnumbers[]=$mob;
+			}
+		}
+	}
+	if (empty($mobnumbers)){
+		return;
+	}
+	$send_result_id=0;
+	if ($custom_name){
+		foreach($mobnumbers as $to){
+			$custom_sms_message=str_replace("[name]",$to['name'],$sms_message);
+			if (!subitosms_ws_send_message($options,array($to['mobnumber']),0,$custom_sms_message,$send_result_id,false)){
+				return;
+			}
+		}		
+	}else{
+		subitosms_ws_send_message($options,$mobnumbers,0,$sms_message,$send_result_id,false);
+	}	
+}
+
+
+/*
  * Web Service
 */
 
-function subitosms_ws_get_credit($options,&$credit){
+function subitosms_ws_get_credit($options,&$credit,$report_error=true){
 	$credit=0;
-	$result=subitosms_ws_query(array('username'=>$options['username'],'password'=>$options['password']));
+	$result=subitosms_ws_query(array('username'=>$options['username'],'password'=>$options['password']),$report_error);
 	if ($result===false){
 		return;
 	}
@@ -473,11 +742,13 @@ function subitosms_ws_get_credit($options,&$credit){
 	if (count($parts)==2 && $parts[0]=='credito'){
 		$credit=$parts[1];	
 	}else{
-		add_settings_error('', 'error_get_credit', esc_html__( sprintf('Error requesting the available credit to SubitoSMS - %s',$result) ,'subitosms'), 'error' ); 
+		if ($report_error){
+			add_settings_error('', 'error_get_credit', esc_html__( sprintf('Error requesting the available credit to SubitoSMS - %s',$result) ,'subitosms'), 'error' ); 
+		}
 	}
 	
 }
-function subitosms_ws_send_message($options,$mobnumbers,$delay,$sms_message,&$send_result_id){
+function subitosms_ws_send_message($options,$mobnumbers,$delay,$sms_message,&$send_result_id,$report_error=true){
 	$send_result_id=0;
 	if (empty($options['smssender'])){
 		$options['smssender']=SUBITOSMS_DEFAULT_SENDER;
@@ -494,7 +765,7 @@ function subitosms_ws_send_message($options,$mobnumbers,$delay,$sms_message,&$se
 		$query['delay']=$delay;
 	}
 	
-	$result=subitosms_ws_query($query);
+	$result=subitosms_ws_query($query,$report_error);
 	if ($result===false){
 		return false;
 	}
@@ -502,13 +773,15 @@ function subitosms_ws_send_message($options,$mobnumbers,$delay,$sms_message,&$se
 	if (count($parts)==2 && $parts[0]=='id'){
 		$send_result_id=$parts[1];	
 	}else{
-		add_settings_error('', 'error_send_message', esc_html__( sprintf('Error sending the message to Subito SMS - %s',$result) ,'subitosms'), 'error' ); 
+		if ($report_error){
+			add_settings_error('', 'error_send_message', esc_html__( sprintf('Error sending the message to Subito SMS - %s',$result) ,'subitosms'), 'error' ); 
+		}
 		return false;
 	}
 	return true;
 }
 
-function subitosms_ws_query($fields){
+function subitosms_ws_query($fields,$report_error=true){
 	if (SUBITOSMS_TEST){
 		$fields['test']=1;
 	}
@@ -533,7 +806,9 @@ function subitosms_ws_query($fields){
 	);
 	
 	if ( is_wp_error( $response ) ) {
-		add_settings_error('', 'error_query', esc_html__( sprintf('Error contacting Subito SMS - %s:%s',$response->get_error_code(),$response->get_error_message()) ,'subitosms'), 'error' ); 
+		if ($report_error){
+			add_settings_error('', 'error_query', esc_html__( sprintf('Error contacting Subito SMS - %s:%s',$response->get_error_code(),$response->get_error_message()) ,'subitosms'), 'error' ); 
+		}
 		return false;
 	} else {
 		return $response['body'];
