@@ -57,3 +57,5 @@ Yes, registration is free and you can test with some free SMS messages.
 = 1.2 =
 * First public release
 
+== Upgrade Notice ==
+No upgrade notices
