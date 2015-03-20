@@ -50,6 +50,7 @@ Yes, registration is free and you can test with some free SMS messages.
 * Support for WordPress 4.1.1
 * Allow to send SMS to selected users or to all users
 * Allow to automatically send customized SMS when new post is created
+* Localization added
 
 = 1.3 =
 * Support for WordPress 3.8
